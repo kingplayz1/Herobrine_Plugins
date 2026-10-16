@@ -1,7 +1,10 @@
 package com.kingplayz.herobrine.ai;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -187,7 +190,7 @@ public class HauntingDirector {
     private String getCurrentEncounterStageForPlayer(Player player) {
         // Check if player has an active encounter and get its stage
         UUID playerUuid = player.getUniqueId();
-        for (UUID entityUuid : entityRegistry.getEntityDataMap().keySet()) {
+        for (UUID entityUuid : entityRegistry.getEntityDataMap()) {
             UUID targetUuid = entityController.getTargetPlayer(entityUuid);
             if (targetUuid != null && targetUuid.equals(playerUuid)) {
                 // In a full implementation, we'd get the actual stage from entity data
@@ -321,7 +324,7 @@ public class HauntingDirector {
     private int getPlayerEncounterCount(UUID playerUuid) {
         // Placeholder - would count active encounters for this player from registry
         int count = 0;
-        for (UUID entityUuid : entityRegistry.getEntityDataMap().keySet()) {
+        for (UUID entityUuid : entityRegistry.getEntityDataMap()) {
             UUID targetUuid = entityController.getTargetPlayer(entityUuid);
             if (targetUuid != null && targetUuid.equals(playerUuid)) {
                 count++;

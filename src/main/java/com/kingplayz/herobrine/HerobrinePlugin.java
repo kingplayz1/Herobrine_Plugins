@@ -6,15 +6,23 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.kingplayz.herobrine.ai.AdaptiveStalkingAI;
+import com.kingplayz.herobrine.ai.AdvancedAIManager;
 import com.kingplayz.herobrine.ai.EncounterStateManager;
+import com.kingplayz.herobrine.ai.FalseSightingEngine;
 import com.kingplayz.herobrine.ai.HauntingDirector;
+import com.kingplayz.herobrine.command.HerobrineCommand;
+import org.bukkit.Location;
 import com.kingplayz.herobrine.config.ConfigManager;
 import com.kingplayz.herobrine.entity.AppearanceService;
 import com.kingplayz.herobrine.entity.DefaultAppearanceProvider;
 import com.kingplayz.herobrine.entity.EntityRegistry;
 import com.kingplayz.herobrine.entity.HerobrineEntityController;
 import com.kingplayz.herobrine.entity.WhiteEyedAppearanceProvider;
-import com.kingplayz.herobrine.world.AnomallyManager;
+import com.kingplayz.herobrine.persistence.DatabaseManager;
+import com.kingplayz.herobrine.persistence.EncounterRepository;
+import com.kingplayz.herobrine.persistence.PlayerProfileRepository;
+import com.kingplayz.herobrine.world.AnomalyManager;
 import com.kingplayz.herobrine.world.BlockChangeJournal;
 import com.kingplayz.herobrine.world.ProtectionService;
 import com.kingplayz.herobrine.audio.AudioDirector;
@@ -31,6 +39,7 @@ public class HerobrinePlugin extends JavaPlugin {
     private AudioDirector audioDirector;
     private HauntingDirector hauntingDirector;
     private EncounterStateManager encounterStateManager;
+    private FalseSightingEngine falseSightingEngine;
 
     @Override
     public void onEnable() {
@@ -63,7 +72,7 @@ public class HerobrinePlugin extends JavaPlugin {
         hauntingDirector = new HauntingDirector(this, configManager, entityController, entityRegistry, advancedAIManager);
 
         // Create false sighting engine
-        FalseSightingEngine falseSightingEngine = new FalseSightingEngine(this);
+        falseSightingEngine = new FalseSightingEngine(this);
 
         getLogger().info("HerobrineHaunting has been enabled!");
         getLogger().info("White eyes supported: " + appearanceService.supportsWhiteEyes());

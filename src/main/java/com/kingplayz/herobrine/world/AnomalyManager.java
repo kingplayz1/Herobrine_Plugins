@@ -3,6 +3,7 @@ package com.kingplayz.herobrine.world;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -78,7 +79,7 @@ public class AnomalyManager {
                             Location leafLoc = checkLoc.clone().add(0, dy, 0);
                             Block leafBlock = leafLoc.getBlock();
                             if (isLeaves(leafBlock.getType()) &&
-                                    protectionService.canModify(leafLoc, null)) {
+                                    protectionService.canModify(null, leafLoc)) {
 
                                 // Record and remove leaves
                                 blockChangeJournal.recordChange(encounterId, leafBlock);
@@ -112,7 +113,7 @@ public class AnomalyManager {
 
                 // Only replace grass or dirt, and only if we can modify it
                 if (isReplaceableGround(block.getType()) &&
-                        protectionService.canModify(loc, null)) {
+                        protectionService.canModify(null, loc)) {
 
                     blockChangeJournal.recordChange(encounterId, block);
                     block.setType(buildMaterial);
@@ -139,7 +140,7 @@ public class AnomalyManager {
 
             // Only replace replaceable ground
             if (isReplaceableGround(block.getType()) &&
-                    protectionService.canModify(loc, null)) {
+                    protectionService.canModify(null, loc)) {
 
                 blockChangeJournal.recordChange(encounterId, block);
                 block.setType(Material.STONE); // Make it look deliberately placed
@@ -162,7 +163,7 @@ public class AnomalyManager {
 
                     // Check if this is a wall torch or standing torch
                     if (isTorch(block.getType()) &&
-                            protectionService.canModify(checkLoc, null)) {
+                            protectionService.canModify(null, checkLoc)) {
 
                         // Record and remove the torch
                         blockChangeJournal.recordChange(encounterId, block);

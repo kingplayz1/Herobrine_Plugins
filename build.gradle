@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.kingplayz.herobrine'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spigot-snapshots"
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }
+}
+
+dependencies {
+    compileOnly "org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT"
+    runtimeOnly "org.xerial:sqlite-jdbc:3.45.1.0"
+    runtimeOnly "org.yaml:snakeyaml:2.0"
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.kingplayz.herobrine.HerobrinePlugin"
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

@@ -85,13 +85,17 @@ public class WhiteEyedAppearanceProvider implements AppearanceService {
             entity.setCustomName("§r§lHerobrine"); // White bold text
             entity.setCustomNameVisible(true);
             entity.setGravity(false);
-            entity.setMarker(true);
-            entity.setSmall(true);
-            entity.setBasePlate(false);
-            entity.setVisible(true); // Make it visible unlike before
 
-            // Try to make it look more like a player (head only)
-            // This is limited but better than completely invisible
+            // These methods are specific to ArmorStand
+            if (entity.getType() == EntityType.ARMOR_STAND) {
+                org.bukkit.entity.ArmorStand armorStand = (org.bukkit.entity.ArmorStand) entity;
+                armorStand.setMarker(true);
+                armorStand.setSmall(true);
+                armorStand.setBasePlate(false);
+            }
+
+            // Note: setVisible is not a standard Entity method in Bukkit
+            // ArmorStands are always visible by default
         }
 
         return entity;
@@ -107,10 +111,17 @@ public class WhiteEyedAppearanceProvider implements AppearanceService {
         entity.setCustomName("§r§lHerobrine"); // White bold text
         entity.setCustomNameVisible(true);
         entity.setGravity(false);
-        entity.setMarker(true);
-        entity.setSmall(true);
-        entity.setBasePlate(false);
-        entity.setSilent(true); // If available
+
+        // These methods are specific to ArmorStand
+        if (entity.getType() == EntityType.ARMOR_STAND) {
+            org.bukkit.entity.ArmorStand armorStand = (org.bukkit.entity.ArmorStand) entity;
+            armorStand.setMarker(true);
+            armorStand.setSmall(true);
+            armorStand.setBasePlate(false);
+        }
+
+        // Note: setVisible is not a standard Entity method in Bukkit
+        // ArmorStands are always visible by default
 
         // Additional appearance customization would go here
         // For example, setting equipment, potion effects, etc.

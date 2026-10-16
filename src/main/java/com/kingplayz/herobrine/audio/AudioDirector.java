@@ -1,5 +1,6 @@
 package com.kingplayz.herobrine.audio;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -92,7 +93,7 @@ public class AudioDirector {
         if (state.shouldPlayObservingSound()) {
             SoundProfile observation = SoundProfile.observationProfile();
             float volume = observation.getVolume() *
-                    plugin.getConfig().getFloat("audio.observation-volume", 0.25f);
+                    ((float) plugin.getConfig().getDouble("audio.observation-volume", 0.25));
             player.playSound(player.getLocation(), observation.getSound(), volume, 1.0f);
             state.updateObservingSoundTimer();
         }
@@ -113,7 +114,7 @@ public class AudioDirector {
         if (!state.hasPlayedEvidenceSound()) {
             SoundProfile evidence = SoundProfile.evidenceProfile();
             float volume = evidence.getVolume() *
-                    plugin.getConfig().getFloat("audio.manifestation-volume", 0.65f); // Using manifestation volume for evidence as it's more noticeable
+                    ((float) plugin.getConfig().getDouble("audio.manifestation-volume", 0.65)); // Using manifestation volume for evidence as it's more noticeable
             player.playSound(player.getLocation(), evidence.getSound(), volume, 1.0f);
             state.setEvidenceSoundPlayed(true);
         }
@@ -134,7 +135,7 @@ public class AudioDirector {
         if (!state.hasPlayedManifestingSound()) {
             SoundProfile manifestation = SoundProfile.manifestationProfile();
             float volume = manifestation.getVolume() *
-                    plugin.getConfig().getFloat("audio.manifestation-volume", 0.65f);
+                    ((float) plugin.getConfig().getDouble("audio.manifestation-volume", 0.65));
             player.playSound(player.getLocation(), manifestation.getSound(), volume, 1.0f);
             state.setManifestingSoundPlayed(true);
 
@@ -162,7 +163,7 @@ public class AudioDirector {
         if (!state.hasPlayedVanishingSound()) {
             SoundProfile disappearance = SoundProfile.disappearanceProfile();
             float volume = disappearance.getVolume() *
-                    plugin.getConfig().getFloat("audio.manifestation-volume", 0.65f);
+                    ((float) plugin.getConfig().getDouble("audio.manifestation-volume", 0.65));
             player.playSound(player.getLocation(), disappearance.getSound(), volume, 1.0f);
             state.setVanishingSoundPlayed(true);
         }

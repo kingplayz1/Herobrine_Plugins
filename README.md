@@ -50,7 +50,21 @@ See `config.yml` for all available options. The configuration is divided into se
 - `storage`: Database configuration
 
 ## License
-This plugin is protected by the HerobrineHaunting Plugin License Agreement. You may NOT modify, distribute, or use this plugin without explicit written permission from the author (kingplayz1). See LICENSE file for full terms.
+This plugin is protected by the HerobrineHaunting Plugin License Agreement. 
+
+**You are allowed to:**
+- Use this plugin on your own Minecraft server(s) for personal/non-commercial entertainment
+- Run the plugin as-is without modification
+
+**You may NOT:**
+- Modify, adapt, translate, or create derivative works based on this plugin
+- Decompile, disassemble, or reverse engineer this plugin
+- Remove, alter, or obscure any copyright notices or proprietary legends
+- Distribute, sell, license, or otherwise transfer this plugin to any third party
+- Use this plugin in any commercial service or public server without explicit written permission
+- Claim ownership or authorship of this plugin
+
+See the full LICENSE file for complete terms and conditions.
 
 ## Warning
 This plugin is intended for entertainment purposes only. Herobrine is a fictional entity from Minecraft creepypasta. The plugin does not grant any supernatural powers or affect your computer or account outside of the Minecraft server.

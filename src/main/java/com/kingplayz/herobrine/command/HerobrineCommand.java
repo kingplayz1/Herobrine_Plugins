@@ -4,14 +4,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.kingplayz.herobrine.HerobrinePlugin;
 import com.kingplayz.herobrine.config.ConfigManager;
 import com.kingplayz.herobrine.entity.AppearanceService;
 import com.kingplayz.herobrine.entity.EntityRegistry;
 import com.kingplayz.herobrine.entity.HerobrineEntityController;
+import com.kingplayz.herobrine.persistence.PlayerProfileRepository;
 import com.kingplayz.herobrine.world.BlockChangeJournal;
 import java.util.UUID;
 
@@ -37,6 +40,10 @@ public class HerobrineCommand implements CommandExecutor {
             return true;
         }
 
+        // Get commonly used services
+        EntityRegistry entityRegistry = ((HerobrinePlugin) plugin).getEntityRegistry();
+        HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
+
         switch (args[0].toLowerCase()) {
             case "help":
                 sender.sendMessage(ChatColor.AQUA + "Herobrine Haunting Commands:");
@@ -57,22 +64,19 @@ public class HerobrineCommand implements CommandExecutor {
             case "status":
                 ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
                 boolean enabled = configManager.getConfig().getBoolean("haunting.enabled", true);
-                EntityRegistry entityRegistry = ((HerobrinePlugin) plugin).getEntityRegistry();
                 int activeEntities = entityRegistry.getEntityCount();
-                boolean worldModEnabled = configManager.getConfig().getBoolean("world.modify-blocks", false);
 
                 sender.sendMessage(ChatColor.AQUA + "Herobrine Haunting Status:");
                 sender.sendMessage(ChatColor.GREEN + "Enabled: " + ChatColor.WHITE + (enabled ? "true" : "false"));
                 sender.sendMessage(ChatColor.GREEN + "Active Entities: " + ChatColor.WHITE + activeEntities);
-                sender.sendMessage(ChatColor.GREEN + "World Modifications: " + ChatColor.WHITE + (worldModEnabled ? "enabled" : "disabled"));
+                sender.sendMessage(ChatColor.GREEN + "World Modifications: " + ChatColor.WHITE + (configManager.getConfig().getBoolean("world.modify-blocks", false) ? "enabled" : "disabled"));
                 sender.sendMessage(ChatColor.GREEN + "White Eyes Supported: " + ChatColor.WHITE +
                         ((HerobrinePlugin) plugin).getAppearanceService().supportsWhiteEyes());
                 break;
             case "enable":
                 if (sender.hasPermission("herobrine.admin")) {
-                    ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
-                    configManager.getConfig().set("haunting.enabled", true);
-                    configManager.saveConfig();
+                    ((HerobrinePlugin) plugin).getConfigManager().getConfig().set("haunting.enabled", true);
+                    ((HerobrinePlugin) plugin).getConfigManager().saveConfig();
                     sender.sendMessage(ChatColor.GREEN + "Herobrine haunting enabled.");
                 } else {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
@@ -80,9 +84,8 @@ public class HerobrineCommand implements CommandExecutor {
                 break;
             case "disable":
                 if (sender.hasPermission("herobrine.admin")) {
-                    ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
-                    configManager.getConfig().set("haunting.enabled", false);
-                    configManager.saveConfig();
+                    ((HerobrinePlugin) plugin).getConfigManager().getConfig().set("haunting.enabled", false);
+                    ((HerobrinePlugin) plugin).getConfigManager().saveConfig();
                     sender.sendMessage(ChatColor.RED + "Herobrine haunting disabled.");
                 } else {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
@@ -110,8 +113,7 @@ public class HerobrineCommand implements CommandExecutor {
                     }
 
                     // Get configuration for spawn settings
-                    ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
-                    int observationDuration = configManager.getConfig().getInt("appearance.observation-duration-seconds", 8);
+                    int observationDuration = ((HerobrinePlugin) plugin).getConfigManager().getConfig().getInt("appearance.observation-duration-seconds", 8);
 
                     // Spawn Herobrine near the player (behind them)
                     Location playerLoc = target.getLocation();
@@ -121,8 +123,7 @@ public class HerobrineCommand implements CommandExecutor {
                     String encounterId = "test-" + System.currentTimeMillis();
 
                     // Spawn the entity
-                    HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
-                    Entity entity = entityController.spawnHerobrine(
+                    Entity entity = ((HerobrinePlugin) plugin).getEntityController().spawnHerobrine(
                             target,
                             encounterId,
                             spawnLoc,
@@ -131,7 +132,7 @@ public class HerobrineCommand implements CommandExecutor {
 
                     if (entity != null) {
                         // Also create some evidence as part of the spawn
-                        entityController.createEncounterEvidence(target, encounterId);
+                        ((HerobrinePlugin) plugin).getEntityController().createEncounterEvidence(target, encounterId);
                         sender.sendMessage(ChatColor.GREEN + "Spawned Herobrine entity for " + target.getName() +
                                 " (will despawn in " + observationDuration + " seconds)");
                     } else {
@@ -143,8 +144,6 @@ public class HerobrineCommand implements CommandExecutor {
                 break;
             case "despawn":
                 if (sender.hasPermission("herobrine.admin")) {
-                    EntityRegistry entityRegistry = ((HerobrinePlugin) plugin).getEntityRegistry();
-                    HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
                     BlockChangeJournal blockChangeJournal = ((HerobrinePlugin) plugin).getBlockChangeJournal();
 
                     if (args.length < 2) {
@@ -154,7 +153,7 @@ public class HerobrineCommand implements CommandExecutor {
 
                     if (args[1].equalsIgnoreCase("all")) {
                         // Despawn all entities
-                        UUID[] entityUuids = entityRegistry.getEntityDataMap().keySet().toArray(new UUID[0]);
+                        UUID[] entityUuids = entityRegistry.getEntityDataMap().toArray(new UUID[0]);
                         int count = 0;
                         for (UUID uuid : entityUuids) {
                             // Get encounter ID for proper cleanup
@@ -174,8 +173,8 @@ public class HerobrineCommand implements CommandExecutor {
 
                         // Find and despawn entities targeting this player
                         int count = 0;
-                        for (UUID entityUuid : entityRegistry.getEntityDataMap().keySet()) {
-                            UUID targetUuid = ((HerobrinePlugin) plugin).getEntityController().getTargetPlayer(entityUuid);
+                        for (UUID entityUuid : entityRegistry.getEntityDataMap()) {
+                            UUID targetUuid = entityController.getTargetPlayer(entityUuid);
                             if (targetUuid != null && targetUuid.equals(target.getUniqueId())) {
                                 // Get encounter ID for proper cleanup
                                 EntityRegistry.EntityData data = entityRegistry.getEntityData(entityUuid);
@@ -211,13 +210,11 @@ public class HerobrineCommand implements CommandExecutor {
                     switch (eventType) {
                         case "sighting":
                             // Direct sighting - spawn Herobrine briefly
-                            ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
-                            int observationDuration = configManager.getConfig().getInt("appearance.observation-duration-seconds", 8);
+                            int observationDuration = ((HerobrinePlugin) plugin).getConfigManager().getConfig().getInt("appearance.observation-duration-seconds", 8);
                             Location playerLoc = target.getLocation();
                             Location spawnLoc = playerLoc.clone().add(0, 1, 0);
 
-                            HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
-                            Entity entity = entityController.spawnHerobrine(
+                            Entity entity = ((HerobrinePlugin) plugin).getEntityController().spawnHerobrine(
                                     target,
                                     encounterId,
                                     spawnLoc,
@@ -232,19 +229,16 @@ public class HerobrineCommand implements CommandExecutor {
                             break;
                         case "evidence":
                             // Just create evidence without spawning entity
-                            HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
-                            entityController.createEncounterEvidence(target, encounterId);
+                            ((HerobrinePlugin) plugin).getEntityController().createEncounterEvidence(target, encounterId);
                             sender.sendMessage(ChatColor.GREEN + "Triggered evidence event for " + target.getName());
                             break;
                         case "manifestation":
                             // Full manifestation with evidence and brief appearance
-                            ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
-                            int observationDuration = configManager.getConfig().getInt("appearance.observation-duration-seconds", 8);
-                            Location playerLoc = target.getLocation();
-                            Location spawnLoc = playerLoc.clone().add(0, 1, 0);
+                            observationDuration = ((HerobrinePlugin) plugin).getConfigManager().getConfig().getInt("appearance.observation-duration-seconds", 8);
+                            playerLoc = target.getLocation();
+                            spawnLoc = playerLoc.clone().add(0, 1, 0);
 
-                            HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
-                            Entity entity = entityController.spawnHerobrine(
+                            entity = ((HerobrinePlugin) plugin).getEntityController().spawnHerobrine(
                                     target,
                                     encounterId,
                                     spawnLoc,
@@ -252,7 +246,7 @@ public class HerobrineCommand implements CommandExecutor {
                             );
 
                             if (entity != null) {
-                                entityController.createEncounterEvidence(target, encounterId);
+                                ((HerobrinePlugin) plugin).getEntityController().createEncounterEvidence(target, encounterId);
                                 sender.sendMessage(ChatColor.GREEN + "Triggered manifestation event for " + target.getName());
                             } else {
                                 sender.sendMessage(ChatColor.RED + "Failed to trigger manifestation event");
@@ -279,11 +273,8 @@ public class HerobrineCommand implements CommandExecutor {
                         break;
                     }
 
-                    EntityRegistry entityRegistry = ((HerobrinePlugin) plugin).getEntityRegistry();
-                    HerobrineEntityController entityController = ((HerobrinePlugin) plugin).getEntityController();
-
                     boolean foundActive = false;
-                    for (UUID entityUuid : entityRegistry.getEntityDataMap().keySet()) {
+                    for (UUID entityUuid : entityRegistry.getEntityDataMap()) {
                         UUID targetUuid = entityController.getTargetPlayer(entityUuid);
                         if (targetUuid != null && targetUuid.equals(target.getUniqueId())) {
                             EntityRegistry.EntityData data = entityRegistry.getEntityData(entityUuid);
@@ -325,8 +316,7 @@ public class HerobrineCommand implements CommandExecutor {
                 break;
             case "reload":
                 if (sender.hasPermission("herobrine.admin")) {
-                    ConfigManager configManager = ((HerobrinePlugin) plugin).getConfigManager();
-                    configManager.reloadConfig();
+                    ((HerobrinePlugin) plugin).getConfigManager().reloadConfig();
                     sender.sendMessage(ChatColor.GREEN + "Configuration reloaded.");
                 } else {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
