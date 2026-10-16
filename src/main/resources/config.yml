@@ -1,0 +1,86 @@
+# HerobrineHaunting Configuration File
+# This is a basic configuration. Adjust as needed.
+
+settings:
+  enabled: true
+  debug: false
+  locale: en_US
+  check-interval-seconds: 2
+
+haunting:
+  enabled: true
+  mode: full
+  minimum-cooldown-minutes: 20
+  maximum-cooldown-minutes: 45
+  max-active-encounters: 2
+  max-active-per-player: 1
+  eligible-worlds:
+    - world
+  excluded-worlds:
+    - world_spawn
+  night-bonus: true
+  require-survival-mode: true
+  minimum-player-distance: 24
+  maximum-player-distance: 64
+  maximum-encounter-duration-seconds: 120
+
+appearance:
+  enabled: true
+  style: classic_steve
+  white-eyes: true
+  show-nameplate: false
+  observation-duration-seconds: 8
+  vanish-on-approach: true
+  maximum-lifetime-seconds: 120
+
+ai:
+  observation-distance: 48
+  stalking-distance: 18
+  chase-enabled: false
+  teleport-enabled: true
+  attack-enabled: false
+  target-isolated-players: true
+
+combat:
+  enabled: false
+  damage-enabled: false
+  base-damage: 2.0
+  attack-cooldown-seconds: 3
+  maximum-chase-seconds: 15
+  safe-zone-respect: true
+
+world:
+  modify-blocks: false
+  structures-enabled: false
+  restore-modified-blocks: true
+  restoration-on-disable: true
+  max-block-changes-per-encounter: 32
+  max-concurrent-block-changes: 10
+  protected-worlds:
+    - world_spawn
+  protect-player-claims: true
+  avoid-player-built-structures: true
+
+audio:
+  enabled: true
+  profile: cinematic
+  custom-resource-pack: false
+  sound-distance: 32
+  observation-volume: 0.25
+  manifestation-volume: 0.65
+  silence-after-manifestation: true
+  allow-player-mute: true
+
+safety:
+  emergency-disable: false
+  respect-player-opt-out: true
+  cancel-on-world-change: true
+  cancel-on-server-lag: true
+  minimum-tps: 18.0
+  rollback-on-crash-recovery: true
+
+storage:
+  type: sqlite
+  file: data/herobrine.db
+  autosave-interval-seconds: 60
+  retention-days: 30

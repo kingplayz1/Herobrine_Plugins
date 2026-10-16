@@ -1,0 +1,22 @@
+name: HerobrineHaunting
+version: '${version}'
+main: com.kingplayz.herobrine.HerobrinePlugin
+description: Configurable Herobrine horror encounters
+api-version: '26.2'
+author: KingPlayz
+
+commands:
+  herobrine:
+    description: Herobrine haunting controls
+    usage: /herobrine help
+    aliases: [hb]
+
+permissions:
+  herobrine.use:
+    default: true
+  herobrine.player:
+    default: true
+  herobrine.admin:
+    default: op
+  herobrine.rollback:
+    default: op
