@@ -95,9 +95,12 @@ public class WhiteEyedAppearanceProvider implements AppearanceService {
                 armorStand.setSmall(true);
                 armorStand.setBasePlate(false);
 
-                // Make the armor stand invisible (model hidden) while keeping the name visible
-                // This fixes the issue where players could see the armor stand model
-                armorStand.setInvisible(true);
+                // Keep armor stand visible but customize it to look like Herobrine
+                // - Small size for slender appearance
+                // - No base plate
+                // - Marker mode for stable positioning
+                // - Invisible set to false so the model is visible
+                armorStand.setInvisible(false);
                 armorStand.setCollidable(true);
 
                 // Custom name for identification (visible)
@@ -137,9 +140,12 @@ public class WhiteEyedAppearanceProvider implements AppearanceService {
             armorStand.setSmall(true);
             armorStand.setBasePlate(false);
 
-            // Make the armor stand invisible (model hidden) while keeping the name visible
-            // This fixes the issue where players could see the armor stand model
-            armorStand.setInvisible(true);
+            // Keep armor stand visible but customize it to look like Herobrine
+            // - Small size for slender appearance
+            // - No base plate
+            // - Marker mode for stable positioning
+            // - Invisible set to false so the model is visible
+            armorStand.setInvisible(false);
         }
 
         // Note: setVisible is not a standard Entity method in Bukkit
