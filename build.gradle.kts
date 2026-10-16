@@ -1,30 +1,30 @@
 plugins {
     java
+    id("org.jetbrains.kotlin.jvm") version "2.0.0" apply false
 }
 
 group = "com.kingplayz.herobrine"
 version = "1.0.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
     mavenCentral()
-    maven {
-        name = "papermc"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
+    flatDir {
+        dirs 'libs'
     }
 }
 
 dependencies {
-    compileOnly "papermc:papermc-api:1.20.4-R0.1-SNAPSHOT"
-    compileOnly "org.xerial:sqlite-jdbc:3.45.1.0"
-    compileOnly "org.yaml:snakeyaml:2.0"
+    compileOnly(name: 'spigot-api-1.20.4-R0.1-SNAPSHOT')
+    runtimeOnly("org.xerial:sqlite-jdbc:3.45.1.0")
+    runtimeOnly("org.yaml:snakeyaml:2.0")
 }
 
-tasks.named("jar") {
+tasks.named<Jar>("jar") {
     manifest {
         attributes["Main-Class"] = "com.kingplayz.herobrine.HerobrinePlugin"
     }
@@ -32,10 +32,10 @@ tasks.named("jar") {
     dependsOn(configurations.compileOnly)
     doFirst {
         from("src/main/resources") {
-            include "plugin.yml"
-            include "config.yml"
-            include "messages.yml"
-            include "sounds.yml"
+            include("plugin.yml")
+            include("config.yml")
+            include("messages.yml")
+            include("sounds.yml")
         }
     }
 }
