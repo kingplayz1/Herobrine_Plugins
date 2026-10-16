@@ -45,13 +45,25 @@ public class HerobrinePlugin extends JavaPlugin {
         blockChangeJournal = new BlockChangeJournal();
         anomalyManager = new AnomalyManager(this, protectionService, blockChangeJournal);
         audioDirector = new AudioDirector(this);
-        encounterStateManager = new EncounterStateManager(this, null, entityRegistry, audioDirector, anomalyManager, blockChangeJournal);
-        hauntingDirector = new HauntingDirector(this, configManager, null, entityRegistry);
+
+        // Initialize persistence layer
+        DatabaseManager dbManager = new DatabaseManager(this);
+        PlayerProfileRepository playerRepo = new PlayerProfileRepository(dbManager);
+        EncounterRepository encounterRepo = new EncounterRepository(dbManager);
+
+        // Initialize entity controller (needed by other managers)
         entityController = new HerobrineEntityController(this, appearanceService, entityRegistry, anomalyManager, blockChangeJournal, audioDirector);
 
-        // Now that we have the entityController, update the managers that need it
+        // Create adaptive stalking AI
+        AdaptiveStalkingAI adaptiveStalkingAI = new AdaptiveStalkingAI(this, entityRegistry, entityController, playerRepo, dbManager);
+
+        // Create managers with proper dependencies
+        AdvancedAIManager advancedAIManager = new AdvancedAIManager(this, dbManager, playerRepo, encounterRepo, entityRegistry, entityController, adaptiveStalkingAI);
         encounterStateManager = new EncounterStateManager(this, entityController, entityRegistry, audioDirector, anomalyManager, blockChangeJournal);
-        hauntingDirector = new HauntingDirector(this, configManager, entityController, entityRegistry);
+        hauntingDirector = new HauntingDirector(this, configManager, entityController, entityRegistry, advancedAIManager);
+
+        // Create false sighting engine
+        FalseSightingEngine falseSightingEngine = new FalseSightingEngine(this);
 
         getLogger().info("HerobrineHaunting has been enabled!");
         getLogger().info("White eyes supported: " + appearanceService.supportsWhiteEyes());
@@ -67,13 +79,27 @@ public class HerobrinePlugin extends JavaPlugin {
     }
 
     /**
-     * Updates all active encounters - called periodically.
+     * Updates all active encounters and checks for false sightings - called periodically.
      */
     private void updateEncounters() {
         if (encounterStateManager != null) {
             // In a full implementation, we'd iterate through all active entities
             // For now, we'll just note that this should happen
             // encounterStateManager.updateAllEncounters();
+        }
+
+        // Check for false sightings for all online players
+        if (falseSightingEngine != null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Location falseSightingLoc = falseSightingEngine.maybeGenerateFalseSighting(player);
+                if (falseSightingLoc != null) {
+                    // In a full implementation, we would spawn a temporary entity here
+                    // For now, we'll just log that a false sighting was generated
+                    // The actual visual would be handled by spawning a temporary entity
+                    // that disappears after a short time
+                    player.sendMessage(ChatColor.DARK_PURPLE + "You think you saw something in the distance...");
+                }
+            }
         }
     }
 

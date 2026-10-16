@@ -9,6 +9,7 @@ import com.kingplayz.herobrine.persistence.PlayerProfileRepository;
 import com.kingplayz.herobrine.persistence.EncounterRepository;
 import com.kingplayz.herobrine.entity.EntityRegistry;
 import com.kingplayz.herobrine.entity.HerobrineEntityController;
+import com.kingplayz.herobrine.ai.AdaptiveStalkingAI.PlayerBehaviorPattern;
 import java.util.UUID;
 import java.util.Random;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.Map;
 /**
  * Advanced AI features for Herobrine hauntings.
  * Implements player scoring, cooldown tracking, encounter history, and sophisticated encounter selection.
+ * Also includes adaptive stalking AI that learns player behavior patterns.
  */
 public class AdvancedAIManager {
 
@@ -26,6 +28,7 @@ public class AdvancedAIManager {
     private final EncounterRepository encounterRepo;
     private final EntityRegistry entityRegistry;
     private final HerobrineEntityController entityController;
+    private final AdaptiveStalkingAI adaptiveStalkingAI;
     private final Random random = new Random();
 
     // Cache for player scores to avoid recalculating every tick
@@ -37,22 +40,26 @@ public class AdvancedAIManager {
                              PlayerProfileRepository playerRepo,
                              EncounterRepository encounterRepo,
                              EntityRegistry entityRegistry,
-                             HerobrineEntityController entityController) {
+                             HerobrineEntityController entityController,
+                             AdaptiveStalkingAI adaptiveStalkingAI) {
         this.plugin = plugin;
         this.dbManager = dbManager;
         this.playerRepo = playerRepo;
         this.encounterRepo = encounterRepo;
         this.entityRegistry = entityRegistry;
         this.entityController = entityController;
+        this.adaptiveStalkingAI = adaptiveStalkingAI;
     }
 
     /**
      * Calculates a comprehensive eligibility score for a player.
      * This replaces the basic scoring in HauntingDirector with advanced features.
+     * Also incorporates adaptive stalking AI insights.
      * @param player The player to score
+     * @param currentEncounterStage The current encounter stage (if any)
      * @return A score from 0.0 to 1.0 representing eligibility
      */
-    public double calculateAdvancedEligibilityScore(Player player) {
+    public double calculateAdvancedEligibilityScore(Player player, String currentEncounterStage) {
         UUID playerUuid = player.getUniqueId();
 
         // Check if player is opted out
@@ -64,15 +71,39 @@ public class AdvancedAIManager {
         updatePlayerScoreCacheIfNeeded();
 
         // Get cached score or calculate if not in cache
-        PlayerScore score = playerScoreCache.get(playerUuid);
-        if (score == null) {
-            score = calculatePlayerScore(player);
-            playerScoreCache.put(playerUuid, score);
+        PlayerScore baseScore = playerScoreCache.get(playerUuid);
+        if (baseScore == null) {
+            baseScore = calculatePlayerScore(player);
+            playerScoreCache.put(playerUuid, baseScore);
+        }
+
+        // Incorporate adaptive stalking AI insights
+        double adaptiveModification = 1.0; // Default: no modification
+        if (adaptiveStalkingAI != null) {
+            // Get the recommended next action based on player behavior
+            String recommendedAction = adaptiveStalkingAI.recommendNextAction(player, currentEncounterStage);
+
+            // Modify the score based on adaptive insights
+            switch (recommendedAction) {
+                case "change_position":
+                    // Slightly increase eligibility if Herobrine should change position
+                    adaptiveModification *= 1.05;
+                    break;
+                case "leave_evidence":
+                    // Increase eligibility if Herobrine should leave evidence instead of forcing encounter
+                    adaptiveModification *= 1.03;
+                    break;
+                case "standard":
+                default:
+                    // No modification for standard behavior
+                    adaptiveModification *= 1.0;
+                    break;
+            }
         }
 
         // Apply randomness to prevent predictability
         double randomFactor = 0.8 + (random.nextDouble() * 0.4); // 0.8 to 1.2
-        double finalScore = Math.min(1.0, score.getTotalScore() * randomFactor);
+        double finalScore = Math.min(1.0, baseScore.getTotalScore() * randomFactor * adaptiveModification);
 
         return finalScore;
     }
