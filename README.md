@@ -11,7 +11,7 @@ A configurable Minecraft server plugin that brings the Herobrine creepypasta to 
 - Compatible with Paper and Purpur servers
 
 ## Installation
-1. Ensure you are running a Paper or Purpur server for Minecraft 1.20.4-R0.1-SNAPSHOT (or compatible version).
+1. Ensure you are running a Paper or Purpur server for Minecraft 1.20.4-R0.1-SNAPSHOT (or compatible version). **Plugin version: 1.1.0**
 2. Download the latest release of `HerobrineHaunting.jar`.
 3. Place the jar in your server's `plugins` directory.
 4. Start the server to generate the default configuration.

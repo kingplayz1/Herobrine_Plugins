@@ -4,10 +4,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.StringUtil;
+import java.util.Arrays;
 
 import com.kingplayz.herobrine.HerobrinePlugin;
 import com.kingplayz.herobrine.config.ConfigManager;
@@ -16,9 +19,12 @@ import com.kingplayz.herobrine.entity.EntityRegistry;
 import com.kingplayz.herobrine.entity.HerobrineEntityController;
 import com.kingplayz.herobrine.persistence.PlayerProfileRepository;
 import com.kingplayz.herobrine.world.BlockChangeJournal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
-public class HerobrineCommand implements CommandExecutor {
+public class HerobrineCommand implements CommandExecutor, TabCompleter {
 
     private final JavaPlugin plugin;
 
@@ -328,5 +334,42 @@ public class HerobrineCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+
+        if (args.length == 1) {
+            // First argument - main subcommands
+            List<String> subcommands = Arrays.asList("help", "status", "enable", "disable", "optout", "spawn", "despawn", "event", "inspect", "reset", "reload");
+            StringUtil.copyPartialMatches(args[0], subcommands, completions);
+        } else if (args.length == 2) {
+            // Second argument - depends on first argument
+            switch (args[0].toLowerCase()) {
+                case "spawn":
+                case "despawn":
+                case "inspect":
+                case "reset":
+                    // These take player names as second argument
+                    for (Player player : plugin.getServer().getOnlinePlayers()) {
+                        completions.add(player.getName());
+                    }
+                    break;
+
+                case "event":
+                    // Second arg should be event type
+                    List<String> eventTypes = Arrays.asList("sighting", "evidence", "manifestation");
+                    StringUtil.copyPartialMatches(args[1], eventTypes, completions);
+                    break;
+            }
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("event")) {
+            // Third argument - for event command when second arg is incomplete
+            List<String> eventTypes = Arrays.asList("sighting", "evidence", "manifestation");
+            StringUtil.copyPartialMatches(args[2], eventTypes, completions);
+        }
+
+        Collections.sort(completions);
+        return completions;
     }
 }

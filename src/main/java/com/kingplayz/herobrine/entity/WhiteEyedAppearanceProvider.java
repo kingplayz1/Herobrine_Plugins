@@ -68,6 +68,8 @@ public class WhiteEyedAppearanceProvider implements AppearanceService {
     /**
      * Creates a fallback entity using armor stand with custom name tag.
      * While this doesn't give true white eyes, it provides a visible marker.
+     * Also attempts to disguise the armor stand to look more like Herobrine
+     * by setting appropriate properties.
      * @return Armor stand entity
      */
     private Entity createFallbackEntity() {
@@ -92,10 +94,25 @@ public class WhiteEyedAppearanceProvider implements AppearanceService {
                 armorStand.setMarker(true);
                 armorStand.setSmall(true);
                 armorStand.setBasePlate(false);
-            }
 
-            // Note: setVisible is not a standard Entity method in Bukkit
-            // ArmorStands are always visible by default
+                // Ensure the armor stand stays at spawn and doesn't despawn
+                armorStand.setInvisible(false);
+                armorStand.setCollidable(true);
+
+                // Custom name for identification (visible)
+                armorStand.setCustomNameVisible(true);
+
+                // Set small size to make it less like a regular mob armor stand
+                // and more like a slender Herobrine figure
+                // (Already set above via armorStand.setSmall(true))
+
+                // The bold custom name "§r§lHerobrine" makes it identifiable
+                // §r resets all formatting, §l makes text bold
+
+                // Note: setVisible is not a standard Entity method in Bukkit
+                // ArmorStands are always visible by default
+                // The combination of custom name + slender appearance helps players recognize Herobrine
+            }
         }
 
         return entity;
