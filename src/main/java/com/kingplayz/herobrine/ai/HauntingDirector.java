@@ -81,7 +81,7 @@ public class HauntingDirector {
         }
 
         isRunning = true;
-        directorTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::evaluateHauntingConditions,
+        directorTask = Bukkit.getScheduler().runTaskTimer(plugin, this::evaluateHauntingConditions,
                 checkIntervalTicks, checkIntervalTicks);
         plugin.getLogger().info("Herobrine Haunting Director started.");
     }
