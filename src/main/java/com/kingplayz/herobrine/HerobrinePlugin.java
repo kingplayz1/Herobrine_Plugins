@@ -18,7 +18,7 @@ import com.kingplayz.herobrine.entity.AppearanceService;
 import com.kingplayz.herobrine.entity.DefaultAppearanceProvider;
 import com.kingplayz.herobrine.entity.EntityRegistry;
 import com.kingplayz.herobrine.entity.HerobrineEntityController;
-import com.kingplayz.herobrine.entity.WhiteEyedAppearanceProvider;
+import com.kingplayz.herobrine.entity.CitizensAppearanceProvider;
 import com.kingplayz.herobrine.persistence.DatabaseManager;
 import com.kingplayz.herobrine.persistence.EncounterRepository;
 import com.kingplayz.herobrine.persistence.PlayerProfileRepository;
@@ -46,8 +46,8 @@ public class HerobrinePlugin extends JavaPlugin {
         // Plugin startup logic
         configManager = new ConfigManager(this);
 
-        // Use the white-eyed appearance provider
-        appearanceService = new WhiteEyedAppearanceProvider(this);
+        // Use the Citizens-optional appearance provider
+        appearanceService = new CitizensAppearanceProvider(this);
 
         entityRegistry = new EntityRegistry();
         protectionService = new ProtectionService(this);
